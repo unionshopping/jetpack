@@ -1,6 +1,7 @@
 <?php
 /**
- * Handle the registration and use of all blocks available in Jetpack for the block editor, aka Gutenberg.
+ * Handles server-side registration and use of all blocks available in Jetpack for the block editor, aka Gutenberg.
+ * Works in tandem with client-side block registration via `_inc/blocks/block-manifest.json`
  *
  * @package Jetpack
  */
@@ -271,12 +272,14 @@ class Jetpack_Gutenberg {
 			plugins_url( '_inc/blocks/', JETPACK__PLUGIN_FILE )
 		);
 
-		$jp_react_page = new Jetpack_React_Page();
-		wp_localize_script(
-			'jetpack-blocks-editor',
-			'Jetpack_Initial_State',
-			$jp_react_page->get_initial_state()
-		);
+		if ( class_exists( 'Jetpack_React_Page' ) ) {
+			$jp_react_page = new Jetpack_React_Page();
+			wp_localize_script(
+				'jetpack-blocks-editor',
+				'Jetpack_Initial_State',
+				$jp_react_page->get_initial_state()
+			);
+		}
 
 		wp_localize_script(
 			'jetpack-blocks-editor',

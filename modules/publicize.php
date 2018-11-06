@@ -77,5 +77,3 @@ function publicize_init() {
 }
 
 }
-
-jetpack_register_block( 'publicize' );
