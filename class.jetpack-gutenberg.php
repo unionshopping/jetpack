@@ -179,7 +179,7 @@ class Jetpack_Gutenberg {
 	 * @return bool
 	 */
 	public static function should_load_blocks() {
-		if ( ! Jetpack::is_active() ) {
+		if ( ! Jetpack::is_active() && ! Jetpack::is_development_mode() ) {
 			return false;
 		}
 
