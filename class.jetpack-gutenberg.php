@@ -78,14 +78,36 @@ class Jetpack_Gutenberg {
 		}
 	}
 
+	/**
+	 * Checks for a given .json file in the `_inc/blocks` folder.
+	 *
+	 * @param $preset The name of the .json file to look for.
+	 *
+	 * @return bool True if the file is found.
+	 */
 	public static function preset_exists( $preset ) {
 		return file_exists( JETPACK__PLUGIN_DIR . '/_inc/blocks/' . $preset . '.json' );
 	}
 
+	/**
+	 * Decodes JSON loaded from a preset file in `_inc/blocks`
+	 *
+	 * @param $preset The name of the .json file to load.
+	 *
+	 * @return mixed Returns an object if the file is present, or false if a valid .json file is not present.
+	 */
 	public static function get_preset( $preset ) {
 		return json_decode( file_get_contents(  JETPACK__PLUGIN_DIR . '/_inc/blocks/' . $preset . '.json' ) );
 	}
 
+	/**
+	 * Filters the results of `apply_filter( 'jetpack_set_available_blocks', array() )`
+	 * using the contents of `_inc/blocks/blocks-manifest.json`
+	 *
+	 * @param $blocks The default list.
+	 *
+	 * @return array A list of blocks: eg [ 'publicize', 'markdown' ]
+	 */
 	public static function jetpack_set_available_blocks( $blocks ) {
 		$preset_blocks_manifest =  self::preset_exists( 'block-manifest' ) ? self::get_preset( 'block-manifest' ) : (object) array( 'blocks' => $blocks );
 		$preset_blocks = isset( $preset_blocks_manifest->blocks ) ? (array) $preset_blocks_manifest->blocks : array() ;
@@ -97,6 +119,9 @@ class Jetpack_Gutenberg {
 		return $preset_blocks;
 	}
 
+	/**
+	 * @return array A list of block-availability information, eg: [ "publicize" => ["available" => true ], "markdown" => [ "available" => false, "unavailable_reason" => 'missing_module' ] ]
+	 */
 	public static function get_block_availability() {
 
 		if ( ! self::should_load_blocks() ) {
