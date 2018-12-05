@@ -416,10 +416,6 @@ array.prototype.flat@^1.2.1:
     es-abstract "^1.10.0"
     function-bind "^1.1.1"
 
-arrify@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
-
 asap@~2.0.3, asap@~2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
@@ -1685,7 +1681,7 @@ classnames@2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
 
-clean-css@^4.0.4:
+clean-css@4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.2.1.tgz#2d411ef76b8569b6d0c84068dabe85b0aa5e5c17"
   dependencies:
@@ -3496,15 +3492,14 @@ gulp-check@0.1.2:
     gulp-util "^2.2.14"
     through2 "^0.4.1"
 
-gulp-clean-css@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/gulp-clean-css/-/gulp-clean-css-2.4.0.tgz#2ae48109fe83ccc967ff5ad53c044949a4863b36"
+gulp-clean-css@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/gulp-clean-css/-/gulp-clean-css-4.0.0.tgz#1b67f1636e2b0da73499a7602396a0d570eb9626"
   dependencies:
-    clean-css "^4.0.4"
-    gulp-util "^3.0.8"
-    object-assign "^4.1.1"
-    through2 "^2.0.3"
-    vinyl-sourcemaps-apply "^0.2.1"
+    clean-css "4.2.1"
+    plugin-error "1.0.1"
+    through2 "3.0.0"
+    vinyl-sourcemaps-apply "0.2.1"
 
 gulp-cli@^2.0.0:
   version "2.0.1"
@@ -7657,7 +7652,7 @@ through2-filter@^2.0.0:
     through2 "~2.0.0"
     xtend "~4.0.0"
 
-through2@*:
+through2@*, through2@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/through2/-/through2-3.0.0.tgz#468b461df9cd9fcc170f22ebf6852e467e578ff2"
   dependencies:
@@ -8183,7 +8178,7 @@ vinyl-sourcemap@^1.1.0:
     remove-bom-buffer "^3.0.0"
     vinyl "^2.0.0"
 
-vinyl-sourcemaps-apply@^0.2.0, vinyl-sourcemaps-apply@^0.2.1:
+vinyl-sourcemaps-apply@0.2.1, vinyl-sourcemaps-apply@^0.2.0, vinyl-sourcemaps-apply@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/vinyl-sourcemaps-apply/-/vinyl-sourcemaps-apply-0.2.1.tgz#ab6549d61d172c2b1b87be5c508d239c8ef87705"
   dependencies:
