@@ -13,9 +13,10 @@
  * @since 7.1
  */
 class Jetpack_Tiled_Gallery_Block {
-	/* Widths in pixels for building srcsets */
-	const IMG_SRCSET_WIDTH_MIN = 600;
-	const IMG_SRCSET_WIDTH_MAX = 2000;
+	/* Values for building srcsets */
+	const IMG_SRCSET_WIDTH_MAX  = 2000;
+	const IMG_SRCSET_WIDTH_MIN  = 600;
+	const IMG_SRCSET_WIDTH_STEP = 300;
 
 	/**
 	 * Register the block
@@ -46,7 +47,6 @@ class Jetpack_Tiled_Gallery_Block {
 		Jetpack_Gutenberg::load_assets_as_required( 'tiled-gallery', $dependencies );
 
 		$is_squareish_layout = self::is_squareish_layout( $attr );
-		$srcset_step         = 300;
 
 		if ( function_exists( 'jetpack_photon_url' )
 			&& preg_match_all( '/<img [^>]+>/', $content, $images )
@@ -83,7 +83,7 @@ class Jetpack_Tiled_Gallery_Block {
 						$min_width = min( self::IMG_SRCSET_WIDTH_MIN, $orig_width, $orig_height );
 						$max_width = min( self::IMG_SRCSET_WIDTH_MAX, $orig_width, $orig_height );
 
-						for ( $w = $min_width; $w <= $max_width; $w = min( $max_width, $w + $srcset_step ) ) {
+						for ( $w = $min_width; $w <= $max_width; $w = min( $max_width, $w + self::IMG_SRCSET_WIDTH_STEP ) ) {
 							$photonized_src = jetpack_photon_url(
 								$orig_src,
 								array(
@@ -97,7 +97,7 @@ class Jetpack_Tiled_Gallery_Block {
 						$min_width = min( self::IMG_SRCSET_WIDTH_MIN, $orig_width );
 						$max_width = min( self::IMG_SRCSET_WIDTH_MAX, $orig_width );
 
-						for ( $w = $min_width; $w <= $max_width; $w = min( $max_width, $w + $srcset_step ) ) {
+						for ( $w = $min_width; $w <= $max_width; $w = min( $max_width, $w + self::IMG_SRCSET_WIDTH_STEP ) ) {
 							$photonized_src = jetpack_photon_url(
 								$orig_src,
 								array(
