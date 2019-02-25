@@ -13,6 +13,10 @@
  * @since 7.1
  */
 class Jetpack_Tiled_Gallery_Block {
+	/* Widths in pixels for building srcsets */
+	const IMG_SRCSET_WIDTH_MIN = 600;
+	const IMG_SRCSET_WIDTH_MAX = 2000;
+
 	/**
 	 * Register the block
 	 */
@@ -76,8 +80,8 @@ class Jetpack_Tiled_Gallery_Block {
 
 					$srcset_parts = array();
 					if ( $is_squareish_layout ) {
-						$min_width = min( 600, $orig_width, $orig_height );
-						$max_width = min( 2000, $orig_width, $orig_height );
+						$min_width = min( self::IMG_SRCSET_WIDTH_MIN, $orig_width, $orig_height );
+						$max_width = min( self::IMG_SRCSET_WIDTH_MAX, $orig_width, $orig_height );
 
 						for ( $w = $min_width; $w <= $max_width; $w += $srcset_step ) {
 							$photonized_src = jetpack_photon_url(
@@ -90,8 +94,8 @@ class Jetpack_Tiled_Gallery_Block {
 							$srcset_parts[] = $photonized_src . ' ' . $w . 'w';
 						}
 					} else {
-						$min_width = min( 600, $orig_width );
-						$max_width = min( 2000, $orig_width );
+						$min_width = min( self::IMG_SRCSET_WIDTH_MIN, $orig_width );
+						$max_width = min( self::IMG_SRCSET_WIDTH_MAX, $orig_width );
 
 						for ( $w = $min_width; $w <= $max_width; $w += $srcset_step ) {
 							$photonized_src = jetpack_photon_url(
