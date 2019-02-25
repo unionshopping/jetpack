@@ -58,12 +58,16 @@ class Jetpack_Tiled_Gallery_Block {
 					&& preg_match( '/data-height="([0-9]+)"/', $image_html, $img_width )
 					&& preg_match( '/src="([^"]+)"/', $image_html, $img_src )
 				) {
-					$orig_width  = $img_width[1];
-					$orig_height = $img_height[1];
+					// Drop img src query string so it can be used as a base toadd photon params
+					// for the srcset.
+					$src_parts   = explode( '?', $img_src[1], 2 );
+					$orig_src    = $src_parts[0];
+					$orig_height = absint( $img_height[1] );
+					$orig_width  = absint( $img_width[1] );
 
-					// `src`s are already "photonized". Drop their parameters so we can add our own.
-					$src_parts = explode( '?', $img_src[1], 2 );
-					$orig_src  = $src_parts[0];
+					if ( ! $orig_width || ! $orig_height || ! $orig_src ) {
+						continue;
+					}
 
 					$srcset_parts = array();
 					if ( $is_squareish_layout ) {
