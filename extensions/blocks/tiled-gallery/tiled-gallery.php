@@ -7,6 +7,11 @@
  * @package Jetpack
  */
 
+/**
+ * Jetpack Tiled Gallery Block class
+ *
+ * @since 7.1
+ */
 class Jetpack_Tiled_Gallery_Block {
 	/**
 	 * Register the block
