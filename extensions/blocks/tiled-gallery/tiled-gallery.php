@@ -48,9 +48,7 @@ class Jetpack_Tiled_Gallery_Block {
 
 		$is_squareish_layout = self::is_squareish_layout( $attr );
 
-		if ( function_exists( 'jetpack_photon_url' )
-			&& preg_match_all( '/<img [^>]+>/', $content, $images )
-		) {
+		if ( preg_match_all( '/<img [^>]+>/', $content, $images ) ) {
 			/**
 			 * This block processes all of the images that are found and builds $find and $replace.
 			 *
