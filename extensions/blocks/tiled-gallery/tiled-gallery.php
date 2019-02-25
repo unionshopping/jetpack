@@ -91,7 +91,10 @@ class Jetpack_Tiled_Gallery_Block {
 									'strip'  => 'all',
 								)
 							);
-							$srcset_parts[] = esc_url( $photonized_src ) . ' ' . $w . 'w';
+							$srcset_parts[] = $photonized_src . ' ' . $w . 'w';
+							if ( $w >= $max_width ) {
+								break;
+							}
 						}
 					} else {
 						$min_width = min( self::IMG_SRCSET_WIDTH_MIN, $orig_width );
@@ -105,7 +108,10 @@ class Jetpack_Tiled_Gallery_Block {
 									'w'     => $w,
 								)
 							);
-							$srcset_parts[] = esc_url( $photonized_src ) . ' ' . $w . 'w';
+							$srcset_parts[] = $photonized_src . ' ' . $w . 'w';
+							if ( $w >= $max_width ) {
+								break;
+							}
 						}
 					}
 
