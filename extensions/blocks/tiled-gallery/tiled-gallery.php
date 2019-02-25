@@ -93,14 +93,18 @@ class Jetpack_Tiled_Gallery_Block {
 						}
 					}
 
-					$srcset = 'srcset="' . esc_attr( implode( ',', $srcset_parts ) ) . '"';
+					if ( ! empty( $srcset_parts ) ) {
+						$srcset = 'srcset="' . esc_attr( implode( ',', $srcset_parts ) ) . '"';
 
-					$find[]    = $image_html;
-					$replace[] = str_replace( '<img ', '<img ' . $srcset, $image_html );
+						$find[]    = $image_html;
+						$replace[] = str_replace( '<img ', '<img ' . $srcset, $image_html );
+					}
 				}
 			}
 
-			$content = str_replace( $find, $replace, $content );
+			if ( ! empty( $find ) ) {
+				$content = str_replace( $find, $replace, $content );
+			}
 		}
 
 		/**
