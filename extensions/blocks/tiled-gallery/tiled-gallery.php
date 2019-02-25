@@ -7,16 +7,18 @@
  * @package Jetpack
  */
 
-if (
-	( defined( 'IS_WPCOM' ) && IS_WPCOM ) ||
-	class_exists( 'Jetpack_Photon' ) && Jetpack::is_module_active( 'photon' )
-) {
-	jetpack_register_block(
-		'jetpack/tiled-gallery',
-		array(
-			'render_callback' => 'jetpack_tiled_gallery_load_block_assets',
-		)
-	);
+class Jetpack_Tiled_Gallery_Block {
+	/**
+	 * Register the block
+	 */
+	public static function register() {
+		jetpack_register_block(
+			'jetpack/tiled-gallery',
+			array(
+				'render_callback' => array( __CLASS__, 'render' ),
+			)
+		);
+	}
 
 	/**
 	 * Tiled gallery block registration/dependency declaration.
@@ -26,7 +28,7 @@ if (
 	 *
 	 * @return string
 	 */
-	function jetpack_tiled_gallery_load_block_assets( $attr, $content ) {
+	public static function render( $attr, $content ) {
 		$dependencies = array(
 			'lodash',
 			'wp-i18n',
@@ -34,20 +36,71 @@ if (
 		);
 		Jetpack_Gutenberg::load_assets_as_required( 'tiled-gallery', $dependencies );
 
-		if ( ! preg_match_all( '/<img [^>]+>/', $content, $images ) ) {
-			return $content;
-		}
+		$is_squareish_layout = self::is_squareish_layout( $attr );
+		$srcset_step         = 300;
 
-		$find    = array();
-		$replace = array();
-		foreach ( images[0] as $image_html ) {
-			if ( preg_match( '/src="[^"]+"/', $image_html, $img_src ) ) {
-				// @TODO make the photon sources
-				$srcset = esc_attr( implode( ',', array() ) );
+		if ( function_exists( 'jetpack_photon_url' )
+			&& preg_match_all( '/<img [^>]+>/', $content, $images )
+		) {
+			/**
+			 * This block processes all of the images that are found and builds $find and $replace.
+			 *
+			 * The original img is added to the $find array and the replacement is made and added
+			 * to the $replace array. This is so that the same find and replace operations can be
+			 * made on the entire $content.
+			 */
+			$find    = array();
+			$replace = array();
 
-				$find[]    = $image_html;
-				$replace[] = str_replace( '<img ', "<img $srcset", $image_html );
+			foreach ( $images[0] as $image_html ) {
+				if (
+					preg_match( '/data-width="([0-9]+)"/', $image_html, $img_height )
+					&& preg_match( '/data-height="([0-9]+)"/', $image_html, $img_width )
+					&& preg_match( '/src="([^"]+)"/', $image_html, $img_src )
+				) {
+					$orig_width   = $img_width[1];
+					$orig_height  = $img_height[1];
+					$orig_src     = $img_src[1];
+					$srcset_parts = array();
+
+					if ( $is_squareish_layout ) {
+						$min_width = min( 600, $orig_width, $orig_height );
+						$max_width = min( 2000, $orig_width, $orig_height );
+
+						for ( $w = $min_width; $w <= $max_width; $w += $srcset_step ) {
+							$photonized_src = jetpack_photon_url(
+								$orig_src,
+								array(
+									'resize' => $w . ',' . $w,
+									'strip'  => 'all',
+								)
+							);
+							$srcset_parts[] = $photonized_src . ' ' . $w . 'w';
+						}
+					} else {
+						$min_width = min( 600, $orig_width );
+						$max_width = min( 2000, $orig_width );
+
+						for ( $w = $min_width; $w <= $max_width; $w += $srcset_step ) {
+							$photonized_src = jetpack_photon_url(
+								$orig_src,
+								array(
+									'strip' => 'all',
+									'w'     => $w,
+								)
+							);
+							$srcset_parts[] = $photonized_src . ' ' . $w . 'w';
+						}
+					}
+
+					$srcset = 'srcset="' . esc_attr( implode( ',', $srcset_parts ) ) . '"';
+
+					$find[]    = $image_html;
+					$replace[] = str_replace( '<img ', '<img ' . $srcset, $image_html );
+				}
 			}
+
+			$content = str_replace( $find, $replace, $content );
 		}
 
 		/**
@@ -61,4 +114,28 @@ if (
 		 */
 		return apply_filters( 'jetpack_tiled_galleries_block_content', $content );
 	}
+
+	/**
+	 * Determines whether a Tiled Gallery block uses square or circle images (1:1 ratio)
+	 *
+	 * Layouts are block styles and will be available as `is-style-[LAYOUT]` in the className
+	 * attribute. The default (rectangular) will be omitted.
+	 *
+	 * @param  {Array} $attr Attributes key/value array.
+	 * @return {boolean} True if layout is squareish, otherwise false.
+	 */
+	private static function is_squareish_layout( $attr ) {
+		return isset( $attr['className'] )
+			&& (
+				'is-style-square' === $attr['className']
+				|| 'is-style-circle' === $attr['className']
+			);
+	}
+}
+
+if (
+	( defined( 'IS_WPCOM' ) && IS_WPCOM )
+	|| class_exists( 'Jetpack_Photon' ) && Jetpack::is_module_active( 'photon' )
+) {
+	Jetpack_Tiled_Gallery_Block::register();
 }
