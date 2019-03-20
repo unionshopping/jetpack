@@ -5,7 +5,7 @@
  * Sort Order: 8
  * First Introduced: 1.1
  * Requires Connection: Yes
- * Auto Activate: Yes
+ * Auto Activate: No
  * Module Tags: Social
  * Feature: Writing
  * Additional Search Queries: shortlinks, wp.me
