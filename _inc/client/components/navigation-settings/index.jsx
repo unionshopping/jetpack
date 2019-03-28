@@ -141,7 +141,6 @@ export const NavigationSettings = createReactClass( {
 						'infinite-scroll',
 						'minileven',
 						'copy-post',
-						'wordpress-com-compose',
 					] ) && (
 						<NavItem
 							path="#writing"

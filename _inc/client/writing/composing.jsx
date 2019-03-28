@@ -199,17 +199,15 @@ export class Composing extends React.Component {
 	render() {
 		const foundCopyPost = this.props.isModuleFound( 'copy-post' ),
 			foundAtD = this.props.isModuleFound( 'after-the-deadline' ),
-			foundMarkdown = this.props.isModuleFound( 'markdown' ),
-			foundWordPressComCompose = this.props.isModuleFound( 'wordpress-com-compose' );
+			foundMarkdown = this.props.isModuleFound( 'markdown' );
 
-		if ( ! foundCopyPost && ! foundMarkdown && ! foundAtD && ! foundWordPressComCompose ) {
+		if ( ! foundCopyPost && ! foundMarkdown && ! foundAtD ) {
 			return null;
 		}
 
 		const markdown = this.props.module( 'markdown' ),
 			atd = this.props.module( 'after-the-deadline' ),
 			copyPost = this.props.module( 'copy-post' ),
-			wordPressComCompose = this.props.module( 'wordpress-com-compose' ),
 			unavailableInDevMode = this.props.isUnavailableInDevMode( 'after-the-deadline' ),
 			copyPostSettings = (
 				<SettingsGroup
@@ -231,29 +229,6 @@ export class Composing extends React.Component {
 							toggleModule={ this.props.toggleModuleNow }
 						>
 							<span className="jp-form-toggle-explanation">{ copyPost.description }</span>
-						</ModuleToggle>
-					</FormFieldset>
-				</SettingsGroup>
-			),
-			wordPressComComposeSettings = (
-				<SettingsGroup
-					module={ wordPressComCompose }
-					support={ {
-						text: __( 'Allow new block editor posts to be composed on WordPress.com.' ),
-						link: 'https://jetpack.com/support/wordpress-com-block-editor/',
-					} }
-				>
-					<FormFieldset>
-						<ModuleToggle
-							slug="wordpress-com-compose"
-							activated={ !! this.props.getOptionValue( 'wordpress-com-compose' ) }
-							toggling={ this.props.isSavingAnyOption( 'wordpress-com-compose' ) }
-							disabled={ this.props.isSavingAnyOption( 'wordpress-com-compose' ) }
-							toggleModule={ this.props.toggleModuleNow }
-						>
-							<span className="jp-form-toggle-explanation">
-								{ wordPressComCompose.description }
-							</span>
 						</ModuleToggle>
 					</FormFieldset>
 				</SettingsGroup>
@@ -325,7 +300,6 @@ export class Composing extends React.Component {
 				saveDisabled={ this.props.isSavingAnyOption( 'ignored_phrases' ) }
 			>
 				{ foundCopyPost && copyPostSettings }
-				{ foundWordPressComCompose && wordPressComComposeSettings }
 				{ foundMarkdown && markdownSettings }
 				{ foundAtD && atdSettings }
 			</SettingsCard>
