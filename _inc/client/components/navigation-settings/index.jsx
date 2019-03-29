@@ -135,7 +135,6 @@ export const NavigationSettings = createReactClass( {
 					{ this.props.hasAnyOfTheseModules( [
 						'masterbar',
 						'markdown',
-						'after-the-deadline',
 						'custom-content-types',
 						'post-by-email',
 						'infinite-scroll',
@@ -210,7 +209,7 @@ export const NavigationSettings = createReactClass( {
 			}
 			navItems = (
 				<NavTabs selectedText={ this.props.route.name }>
-					{ this.props.hasAnyOfTheseModules( [ 'after-the-deadline', 'post-by-email' ] ) && (
+					{ this.props.hasAnyOfTheseModules( [ 'post-by-email' ] ) && (
 						<NavItem
 							path="#writing"
 							onClick={ this.handleClickForTracking( 'writing' ) }

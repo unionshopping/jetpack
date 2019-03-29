@@ -45,7 +45,6 @@ export class Writing extends React.Component {
 			'copy-post',
 			'masterbar',
 			'markdown',
-			'after-the-deadline',
 			'custom-content-types',
 			'post-by-email',
 			'infinite-scroll',
@@ -60,9 +59,7 @@ export class Writing extends React.Component {
 			return null;
 		}
 
-		const showComposing =
-				this.props.userCanManageModules ||
-				( this.props.userCanEditPosts && this.props.isModuleActivated( 'after-the-deadline' ) ),
+		const showComposing = this.props.userCanManageModules || this.props.userCanEditPosts,
 			showPostByEmail =
 				this.props.userCanManageModules ||
 				( this.props.userCanEditPosts && this.props.isModuleActivated( 'post-by-email' ) );
