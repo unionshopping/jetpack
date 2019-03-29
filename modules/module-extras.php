@@ -57,7 +57,7 @@ $jetpack_tools_to_include = apply_filters( 'jetpack_tools_to_include', $tools );
 if ( ! empty( $jetpack_tools_to_include ) ) {
 	foreach ( $jetpack_tools_to_include as $tool ) {
 		if ( file_exists( JETPACK__PLUGIN_DIR . '/modules/' . $tool ) ) {
-			require_once( JETPACK__PLUGIN_DIR . '/modules/' . $tool );
+			require_once JETPACK__PLUGIN_DIR . '/modules/' . $tool;
 		}
 	}
 }
@@ -72,18 +72,24 @@ add_filter( 'jetpack_widget_name', 'jetpack_widgets_add_suffix' );
 
 add_action( 'blog_privacy_selector', 'priv_notice_privacy_selector' );
 
+/**
+ * Echos notice directing site owners to Jetpack's Private Site feature.
+ */
 function priv_notice_privacy_selector() {
- 	?>
- 	<p>
- 	<?php
-		printf(
-			__( 'You can also make your site completely private by allowing only registered users to see your site. 
-	 			Activate Jetpack\'s Private Site feature <a href="%s">here</a>.', 'jetpack' ),
-			admin_url( 'admin.php?page=jetpack' ) . '#/security?term=private'
-		);
 	?>
- 	</p>
+	<p>
+		<?php
+		wp_kses(
+			sprintf(
+				/* translators: URL to the Jetpack dashboard. */
+				__( 'You can also make your site completely private by allowing only registered users to see your site.  Activate Jetpack\'s Private Site feature <a href="%s">here</a>.', 'jetpack' ),
+				esc_url( admin_url( 'admin.php?page=jetpack' ) . '#/security?term=private' )
+			),
+			array( 'a' => array( 'href' => true ) )
+		);
+		?>
+	</p>
 
- 	<?php
+	<?php
 }
 

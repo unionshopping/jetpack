@@ -36,6 +36,8 @@ function phpcsFilesToFilter( file ) {
 		'class.jetpack-gutenberg.php',
 		'class.jetpack-plan.php',
 		'modules/module-info.php',
+		'modules/private.php',
+		'modules/private/',
 		'functions.opengraph.php',
 	];
 
