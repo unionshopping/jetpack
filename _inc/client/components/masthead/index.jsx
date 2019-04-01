@@ -12,9 +12,12 @@ import analytics from 'lib/analytics';
 /**
  * Internal dependencies
  */
-import { getSiteConnectionStatus, getSandboxDomain } from 'state/connection';
+import {
+	getSiteConnectionStatus,
+	getSandboxDomain,
+	fetchSiteConnectionTest,
+} from 'state/connection';
 import { getCurrentVersion, userCanEditPosts } from 'state/initial-state';
-import { fetchSiteConnectionTest } from 'state/connection';
 
 export class Masthead extends React.Component {
 	static defaultProps = {
@@ -99,27 +102,26 @@ export class Masthead extends React.Component {
 					</div>
 					{ this.props.userCanEditPosts && (
 						<div className="jp-masthead__nav">
-							{ ! isStatic &&
-								this.props.siteConnectionStatus && (
-									<ButtonGroup>
-										<Button
-											compact={ true }
-											href="#/dashboard"
-											primary={ isDashboardView && ! isStatic }
-											onClick={ this.trackDashClick }
-										>
-											{ __( 'Dashboard' ) }
-										</Button>
-										<Button
-											compact={ true }
-											href="#/settings"
-											primary={ ! isDashboardView && ! isStatic }
-											onClick={ this.trackSettingsClick }
-										>
-											{ __( 'Settings' ) }
-										</Button>
-									</ButtonGroup>
-								) }
+							{ ! isStatic && this.props.siteConnectionStatus && (
+								<ButtonGroup>
+									<Button
+										compact={ true }
+										href="#/dashboard"
+										primary={ isDashboardView && ! isStatic }
+										onClick={ this.trackDashClick }
+									>
+										{ __( 'Dashboard' ) }
+									</Button>
+									<Button
+										compact={ true }
+										href="#/settings"
+										primary={ ! isDashboardView && ! isStatic }
+										onClick={ this.trackSettingsClick }
+									>
+										{ __( 'Settings' ) }
+									</Button>
+								</ButtonGroup>
+							) }
 						</div>
 					) }
 				</div>

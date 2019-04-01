@@ -2,8 +2,7 @@
  * External dependencies
  */
 import PropTypes from 'prop-types';
-import React from 'react';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import forEach from 'lodash/forEach';
 import includes from 'lodash/includes';
@@ -42,7 +41,6 @@ export const SearchableModules = withModuleSettingsFormHelpers(
 			// Only should be features that don't already have a UI, and we want to reveal in search.
 			const whitelist = [
 				'contact-form',
-				'copy-post',
 				'custom-css',
 				'enhanced-distribution',
 				'json-api',

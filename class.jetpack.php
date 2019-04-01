@@ -65,7 +65,6 @@ class Jetpack {
 		'jetpack-search-widget',
 		'jetpack-simple-payments-widget-style',
 		'jetpack-widget-social-icons-styles',
-		'jetpack-email-subscribe',
 	);
 
 	/**
@@ -540,6 +539,7 @@ class Jetpack {
 		 */
 		require_once JETPACK__PLUGIN_DIR . 'class.jetpack-gutenberg.php';
 		Jetpack_Gutenberg::init();
+		Jetpack_Gutenberg::load_independent_blocks();
 		add_action( 'enqueue_block_editor_assets', array( 'Jetpack_Gutenberg', 'enqueue_block_editor_assets' ) );
 
 		add_action( 'set_user_role', array( $this, 'maybe_clear_other_linked_admins_transient' ), 10, 3 );
@@ -689,7 +689,7 @@ class Jetpack {
 		}
 
 		// Update the Jetpack plan from API on heartbeats
-		add_action( 'jetpack_heartbeat', array( $this, 'refresh_active_plan_from_wpcom' ) );
+		add_action( 'jetpack_heartbeat', array( 'Jetpack_Plan', 'refresh_from_wpcom' ) );
 
 		/**
 		 * This is the hack to concatenate all css files into one.
@@ -1521,167 +1521,35 @@ class Jetpack {
 	/**
 	 * Make an API call to WordPress.com for plan status
 	 *
-	 * @uses Jetpack_Options::get_option()
-	 * @uses Jetpack_Client::wpcom_json_api_request_as_blog()
-	 * @uses update_option()
-	 *
-	 * @access public
-	 * @static
+	 * @deprecated 7.2.0 Use Jetpack_Plan::refresh_from_wpcom.
 	 *
 	 * @return bool True if plan is updated, false if no update
 	 */
 	public static function refresh_active_plan_from_wpcom() {
-		// Make the API request
-		$request = sprintf( '/sites/%d', Jetpack_Options::get_option( 'id' ) );
-		$response = Jetpack_Client::wpcom_json_api_request_as_blog( $request, '1.1' );
-
-		// Bail if there was an error or malformed response
-		if ( is_wp_error( $response ) || ! is_array( $response ) || ! isset( $response['body'] ) ) {
-			return false;
-		}
-
-		// Decode the results
-		$results = json_decode( $response['body'], true );
-
-		// Bail if there were no results or plan details returned
-		if ( ! is_array( $results ) || ! isset( $results['plan'] ) ) {
-			return false;
-		}
-
-		// Store the option and return true if updated
-		return update_option( 'jetpack_active_plan', $results['plan'], true );
+		_deprecated_function( __METHOD__, 'jetpack-7.2.0', 'Jetpack_Plan::refresh_from_wpcom' );
+		return Jetpack_Plan::refresh_from_wpcom();
 	}
 
 	/**
 	 * Get the plan that this Jetpack site is currently using
 	 *
-	 * @uses get_option()
-	 *
-	 * @access public
-	 * @static
-	 *
-	 * @return array Active Jetpack plan details
+	 * @deprecated 7.2.0 Use Jetpack_Plan::get.
+	 * @return array Active Jetpack plan details.
 	 */
 	public static function get_active_plan() {
-		global $active_plan_cache;
-
-		// this can be expensive to compute so we cache for the duration of a request
-		if ( is_array( $active_plan_cache ) && ! empty( $active_plan_cache ) ) {
-			return $active_plan_cache;
-		}
-
-		$plan = get_option( 'jetpack_active_plan', array() );
-
-		// Set the default options
-		$plan = wp_parse_args( $plan, array(
-			'product_slug' => 'jetpack_free',
-			'class'        => 'free',
-			'features'     => array(
-				'active' => array()
-			),
-		) );
-
-		$supports = array();
-
-		// Define what paid modules are supported by personal plans
-		$personal_plans = array(
-			'jetpack_personal',
-			'jetpack_personal_monthly',
-			'personal-bundle',
-			'personal-bundle-2y',
-		);
-
-		if ( in_array( $plan['product_slug'], $personal_plans ) ) {
-			// special support value, not a module but a separate plugin
-			$supports[] = 'akismet';
-			$plan['class'] = 'personal';
-		}
-
-		// Define what paid modules are supported by premium plans
-		$premium_plans = array(
-			'jetpack_premium',
-			'jetpack_premium_monthly',
-			'value_bundle',
-			'value_bundle-2y',
-		);
-
-		if ( in_array( $plan['product_slug'], $premium_plans ) ) {
-			$supports[] = 'akismet';
-			$supports[] = 'simple-payments';
-			$supports[] = 'vaultpress';
-			$supports[] = 'videopress';
-			$plan['class'] = 'premium';
-		}
-
-		// Define what paid modules are supported by professional plans
-		$business_plans = array(
-			'jetpack_business',
-			'jetpack_business_monthly',
-			'business-bundle',
-			'business-bundle-2y',
-			'vip',
-		);
-
-		if ( in_array( $plan['product_slug'], $business_plans ) ) {
-			$supports[] = 'akismet';
-			$supports[] = 'simple-payments';
-			$supports[] = 'vaultpress';
-			$supports[] = 'videopress';
-			$plan['class'] = 'business';
-		}
-
-		// get available features
-		foreach ( self::get_available_modules() as $module_slug ) {
-			$module = self::get_module( $module_slug );
-			if ( ! isset( $module ) || ! is_array( $module ) ) {
-				continue;
-			}
-			if ( in_array( 'free', $module['plan_classes'] ) || in_array( $plan['class'], $module['plan_classes'] ) ) {
-				$supports[] = $module_slug;
-			}
-		}
-
-		$plan['supports'] = $supports;
-
-		$active_plan_cache = $plan;
-
-		return $plan;
+		_deprecated_function( __METHOD__, 'jetpack-7.2.0', 'Jetpack_Plan::get' );
+		return Jetpack_Plan::get();
 	}
 
 	/**
 	 * Determine whether the active plan supports a particular feature
 	 *
-	 * @uses Jetpack::get_active_plan()
-	 *
-	 * @access public
-	 * @static
-	 *
-	 * @return bool True if plan supports feature, false if not
+	 * @deprecated 7.2.0 Use Jetpack_Plan::supports.
+	 * @return bool True if plan supports feature, false if not.
 	 */
 	public static function active_plan_supports( $feature ) {
-		$plan = Jetpack::get_active_plan();
-
-		// Manually mapping WordPress.com features to Jetpack module slugs
-		foreach ( $plan['features']['active'] as $wpcom_feature ) {
-			switch ( $wpcom_feature ) {
-				case 'wordads-jetpack';
-
-				// WordAds are supported for this site
-				if ( 'wordads' === $feature ) {
-					return true;
-				}
-				break;
-			}
-		}
-
-		if (
-			in_array( $feature, $plan['supports'] )
-			|| in_array( $feature, $plan['features']['active'] )
-		) {
-			return true;
-		}
-
-		return false;
+		_deprecated_function( __METHOD__, 'jetpack-7.2.0', 'Jetpack_Plan::supports' );
+		return Jetpack_Plan::supports( $feature );
 	}
 
 	/**
@@ -1725,6 +1593,25 @@ class Jetpack {
 	}
 
 	/**
+	 * Determines reason for Jetpack development mode.
+	 */
+	public static function development_mode_trigger_text() {
+		if ( ! Jetpack::is_development_mode() ) {
+			return __( 'Jetpack is not in Development Mode.', 'jetpack' );
+		}
+
+		if ( defined( 'JETPACK_DEV_DEBUG' ) && JETPACK_DEV_DEBUG ) {
+			$notice =  __( 'The JETPACK_DEV_DEBUG constant is defined in wp-config.php or elsewhere.', 'jetpack' );
+		} elseif ( site_url() && false === strpos( site_url(), '.' ) ) {
+			$notice = __( 'The site URL lacking a dot (e.g. http://localhost).', 'jetpack' );
+		} else {
+			$notice = __( 'The jetpack_development_mode filter is set to true.', 'jetpack' );
+		}
+
+		return $notice;
+
+	}
+	/**
 	* Get Jetpack development mode notice text and notice class.
 	*
 	* Mirrors the checks made in Jetpack::is_development_mode
@@ -1732,25 +1619,13 @@ class Jetpack {
 	*/
 	public static function show_development_mode_notice() {
 		if ( Jetpack::is_development_mode() ) {
-			if ( defined( 'JETPACK_DEV_DEBUG' ) && JETPACK_DEV_DEBUG ) {
-				$notice = sprintf(
-					/* translators: %s is a URL */
-					__( 'In <a href="%s" target="_blank">Development Mode</a>, via the JETPACK_DEV_DEBUG constant being defined in wp-config.php or elsewhere.', 'jetpack' ),
-					'https://jetpack.com/support/development-mode/'
-				);
-			} elseif ( site_url() && false === strpos( site_url(), '.' ) ) {
-				$notice = sprintf(
-					/* translators: %s is a URL */
-					__( 'In <a href="%s" target="_blank">Development Mode</a>, via site URL lacking a dot (e.g. http://localhost).', 'jetpack' ),
-					'https://jetpack.com/support/development-mode/'
-				);
-			} else {
-				$notice = sprintf(
-					/* translators: %s is a URL */
-					__( 'In <a href="%s" target="_blank">Development Mode</a>, via the jetpack_development_mode filter.', 'jetpack' ),
-					'https://jetpack.com/support/development-mode/'
-				);
-			}
+			$notice = sprintf(
+			/* translators: %s is a URL */
+				__( 'In <a href="%s" target="_blank">Development Mode</a>:', 'jetpack' ),
+				'https://jetpack.com/support/development-mode/'
+			);
+
+			$notice .= ' ' . Jetpack::development_mode_trigger_text();
 
 			echo '<div class="updated" style="border-color: #f0821e;"><p>' . $notice . '</p></div>';
 		}
@@ -2485,7 +2360,7 @@ class Jetpack {
 	 */
 	function handle_deprecated_modules( $modules ) {
 		$deprecated_modules = array(
-			'debug'            => null,  // Closed out and moved to ./class.jetpack-debugger.php
+			'debug'            => null,  // Closed out and moved to the debugger library.
 			'wpcc'             => 'sso', // Closed out in 2.6 -- SSO provides the same functionality.
 			'gplus-authorship' => null,  // Closed out in 3.2 -- Google dropped support.
 		);
@@ -2707,7 +2582,19 @@ class Jetpack {
 	 * @return string The locale as JSON
 	 */
 	public static function get_i18n_data_json() {
-		$i18n_json = JETPACK__PLUGIN_DIR . 'languages/json/jetpack-' . get_user_locale() . '.json';
+
+		// WordPress 5.0 uses md5 hashes of file paths to associate translation
+		// JSON files with the file they should be included for. This is an md5
+		// of '_inc/build/admin.js'.
+		$path_md5 = '1bac79e646a8bf4081a5011ab72d5807';
+
+		$i18n_json =
+				   JETPACK__PLUGIN_DIR
+				   . 'languages/json/jetpack-'
+				   . get_user_locale()
+				   . '-'
+				   . $path_md5
+				   . '.json';
 
 		if ( is_file( $i18n_json ) && is_readable( $i18n_json ) ) {
 			$locale_data = @file_get_contents( $i18n_json );
@@ -2717,12 +2604,7 @@ class Jetpack {
 		}
 
 		// Return valid empty Jed locale
-		return json_encode( array(
-			'' => array(
-				'domain' => 'jetpack',
-				'lang'   => is_admin() ? get_user_locale() : get_locale(),
-			),
-		) );
+		return '{ "locale_data": { "messages": { "": {} } } }';
 	}
 
 	/**
@@ -3070,7 +2952,7 @@ class Jetpack {
 			}
 		}
 
-		if ( ! Jetpack::active_plan_supports( $module ) ) {
+		if ( ! Jetpack_Plan::supports( $module ) ) {
 			return false;
 		}
 
@@ -4752,10 +4634,6 @@ p {
 
 			$secrets = Jetpack::generate_secrets( 'authorize', false, 2 * HOUR_IN_SECONDS );
 
-			$site_icon = ( function_exists( 'has_site_icon') && has_site_icon() )
-				? get_site_icon_url()
-				: false;
-
 			/**
 			 * Filter the type of authorization.
 			 * 'calypso' completes authorization on wordpress.com/jetpack/connect
@@ -4793,10 +4671,11 @@ p {
 					'blogname'      => get_option( 'blogname' ),
 					'site_url'      => site_url(),
 					'home_url'      => home_url(),
-					'site_icon'     => $site_icon,
+					'site_icon'     => get_site_icon_url(),
 					'site_lang'     => get_locale(),
 					'_ui'           => $tracks_identity['_ui'],
 					'_ut'           => $tracks_identity['_ut'],
+					'site_created'  => Jetpack::get_assumed_site_creation_date(),
 				)
 			);
 
@@ -4821,6 +4700,44 @@ p {
 		}
 
 		return $raw ? $url : esc_url( $url );
+	}
+
+	/**
+	 * Get our assumed site creation date.
+	 * Calculated based on the earlier date of either:
+	 * - Earliest admin user registration date.
+	 * - Earliest date of post of any post type.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return string Assumed site creation date and time.
+	 */
+	public static function get_assumed_site_creation_date() {
+		$earliest_registered_users = get_users( array(
+			'role'    => 'administrator',
+			'orderby' => 'user_registered',
+			'order'   => 'ASC',
+			'fields'  => array( 'user_registered' ),
+			'number'  => 1,
+		) );
+		$earliest_registration_date = $earliest_registered_users[0]->user_registered;
+
+		$earliest_posts = get_posts( array(
+			'posts_per_page' => 1,
+			'post_type'      => 'any',
+			'post_status'    => 'any',
+			'orderby'        => 'date',
+			'order'          => 'ASC',
+		) );
+
+		// If there are no posts at all, we'll count only on user registration date.
+		if ( $earliest_posts ) {
+			$earliest_post_date = $earliest_posts[0]->post_date;
+		} else {
+			$earliest_post_date = PHP_INT_MAX;
+		}
+
+		return min( $earliest_registration_date, $earliest_post_date );
 	}
 
 	public static function apply_activation_source_to_args( &$args ) {
@@ -4904,7 +4821,7 @@ p {
 					remove_action( 'jetpack_pre_activate_module',   array( Jetpack_Admin::init(), 'fix_redirect' ) );
 
 					// Don't redirect form the Jetpack Setting Page
-					$referer_parsed = parse_url ( wp_get_referer() );
+					$referer_parsed = wp_parse_url ( wp_get_referer() );
 					// check that we do have a wp_get_referer and the query paramater is set orderwise go to the Jetpack Home
 					if ( isset( $referer_parsed['query'] ) && false !== strpos( $referer_parsed['query'], 'page=jetpack_modules' ) ) {
 						// Take the user to Jetpack home except when on the setting page
@@ -5442,6 +5359,7 @@ p {
 				'state'           => get_current_user_id(),
 				'_ui'             => $tracks_identity['_ui'],
 				'_ut'             => $tracks_identity['_ut'],
+				'site_created'    => Jetpack::get_assumed_site_creation_date(),
 				'jetpack_version' => JETPACK__VERSION
 			),
 			'headers' => array(
@@ -5943,7 +5861,7 @@ p {
 		if ( ! isset( $path ) ) {
 			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			$admin_url = Jetpack::admin_url();
-			$bits      = parse_url( $admin_url );
+			$bits      = wp_parse_url( $admin_url );
 
 			if ( is_array( $bits ) ) {
 				$path   = ( isset( $bits['path'] ) ) ? dirname( $bits['path'] ) : null;
@@ -6160,6 +6078,10 @@ p {
 		return $domains;
 	}
 
+	static function is_redirect_encoded( $redirect_url ) {
+		return preg_match( '/https?%3A%2F%2F/i', $redirect_url ) > 0;
+	}
+
 	// Add all wordpress.com environments to the safe redirect whitelist
 	function allow_wpcom_environments( $domains ) {
 		$domains[] = 'wordpress.com';
@@ -6206,6 +6128,17 @@ p {
 		}
 
 		$die_error = __( 'Someone may be trying to trick you into giving them access to your site.  Or it could be you just encountered a bug :).  Either way, please close this window.', 'jetpack' );
+
+		// Host has encoded the request URL, probably as a result of a bad http => https redirect
+		if ( Jetpack::is_redirect_encoded( $_GET['redirect_to'] ) ) {
+			JetpackTracking::record_user_event( 'error_double_encode' );
+
+			$die_error = sprintf(
+				/* translators: %s is a URL */
+				__( 'Your site is incorrectly double-encoding redirects from http to https. This is preventing Jetpack from authenticating your connection. Please visit our <a href="%s">support page</a> for details about how to resolve this.', 'jetpack' ),
+				'https://jetpack.com/support/double-encoding/'
+			);
+		}
 
 		$jetpack_signature = new Jetpack_Signature( $token->secret, (int) Jetpack_Options::get_option( 'time_diff' ) );
 
@@ -6888,7 +6821,7 @@ p {
 		 */
 		$do_implode = apply_filters( 'jetpack_implode_frontend_css', $do_implode );
 
-		// Do not use the imploded file when default behaviour was altered through the filter
+		// Do not use the imploded file when default behavior was altered through the filter
 		if ( ! $do_implode ) {
 			return;
 		}
@@ -7095,7 +7028,11 @@ p {
 
 		if ( has_action( 'jetpack_dashboard_widget' ) ) {
 			$widget_title = sprintf(
-				esc_html__( 'Stats by %s', 'jetpack' ),
+				wp_kses(
+					/* translators: Placeholder is a Jetpack logo. */
+					__( 'Stats <span>by %s</span>', 'jetpack' ),
+					array( 'span' => array() )
+				),
 				Jetpack::get_jp_emblem( true )
 			);
 

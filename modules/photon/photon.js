@@ -26,7 +26,6 @@
 			return;
 		}
 	}
-
 	/**
 	 * For images lacking explicit dimensions and needing them, try to add them.
 	 */
