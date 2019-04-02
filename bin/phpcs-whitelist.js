@@ -11,4 +11,7 @@ module.exports = [
 	'modules/module-info.php',
 	'modules/theme-tools/social-menu/',
 	'sync/class.jetpack-sync-module-auth.php',
+	'modules/memberships/class-jetpack-memberships.php',
+	'_inc/lib/core-api/wpcom-endpoints/memberships.php',
+	'extensions/blocks/membership-button/membership-button.php',
 ];
