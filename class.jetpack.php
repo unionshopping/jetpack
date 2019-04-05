@@ -829,7 +829,7 @@ class Jetpack {
 	 * from /xmlrpc.php so that we're replicating it as closely as possible.
 	 */
 	function alternate_xmlrpc() {
-		// phpcs:disable PHPCompatibility.PHP.RemovedGlobalVariables.http_raw_post_dataDeprecatedRemoved
+		// phpcs:disable PHPCompatibility
 		global $HTTP_RAW_POST_DATA;
 
 		// Some browser-embedded clients send cookies. We don't want them.
@@ -5350,19 +5350,19 @@ p {
 			}
 		}
 
-		$token = Jetpack_Data::get_access_token( $user_id );
-		if ( ! $token ) {
+		$access_token = Jetpack_Data::get_access_token( $user_id );
+		if ( ! $access_token ) {
 			return false;
 		}
 
 		$token_check = "$token_key.";
-		if ( ! hash_equals( substr( $token->secret, 0, strlen( $token_check ) ), $token_check ) ) {
+		if ( ! hash_equals( substr( $access_token->secret, 0, strlen( $token_check ) ), $token_check ) ) {
 			return false;
 		}
 
 		require_once JETPACK__PLUGIN_DIR . 'class.jetpack-signature.php';
 
-		$jetpack_signature = new Jetpack_Signature( $token->secret, (int) Jetpack_Options::get_option( 'time_diff' ) );
+		$jetpack_signature = new Jetpack_Signature( $access_token->secret, (int) Jetpack_Options::get_option( 'time_diff' ) );
 		if ( isset( $_POST['_jetpack_is_multipart'] ) ) {
 			$post_data   = $_POST;
 			$file_hashes = array();
@@ -5388,9 +5388,12 @@ p {
 			$body = null;
 		}
 
-		$signature = $jetpack_signature->sign_current_request(
-			array( 'body' => is_null( $body ) ? $this->HTTP_RAW_POST_DATA : $body, )
-		);
+		$signature = $jetpack_signature->sign_current_request( array(
+			'body'      => is_null( $body ) ? $this->HTTP_RAW_POST_DATA : $body,
+			'nonce'     => $nonce,
+			'timestamp' => $timestamp,
+			'token'     => $token,
+		) );
 
 		if ( ! $signature ) {
 			return false;
@@ -5437,7 +5440,7 @@ p {
 
 		$this->xmlrpc_verification = array(
 			'type'    => $token_type,
-			'user_id' => $token->external_user_id,
+			'user_id' => $access_token->external_user_id,
 		);
 
 		return $this->xmlrpc_verification;
@@ -7110,7 +7113,7 @@ p {
 	 * @return bool
 	 */
 	public static function is_function_in_backtrace( $names ) {
-		$backtrace = debug_backtrace( false ); // phpcs:ignore PHPCompatibility.PHP.NewFunctionParameters.debug_backtrace_optionsFound
+		$backtrace = debug_backtrace( false ); // phpcs:ignore PHPCompatibility
 		if ( ! is_array( $names ) ) {
 			$names = array( $names );
 		}
@@ -7118,7 +7121,7 @@ p {
 
 		//Do check in constant O(1) time for PHP5.5+
 		if ( function_exists( 'array_column' ) ) {
-			$backtrace_functions = array_column( $backtrace, 'function' ); // phpcs:ignore PHPCompatibility.PHP.NewFunctions.array_columnFound
+			$backtrace_functions = array_column( $backtrace, 'function' ); // phpcs:ignore PHPCompatibility
 			$backtrace_functions_as_keys = array_flip( $backtrace_functions );
 			$intersection = array_intersect_key( $backtrace_functions_as_keys, $names_as_keys );
 			return ! empty ( $intersection );
@@ -7186,7 +7189,7 @@ p {
 	public static function jetpack_tos_agreed() {
 		return Jetpack_Options::get_option( 'tos_agreed' ) || Jetpack::is_active();
 	}
-	
+
 	/**
 	 * Handles activating default modules as well general cleanup for the new connection.
 	 *
